@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#101f22">
+  <title>Ashen Hunt — Play</title>
+  <meta name="description" content="Take the contract. Hunt the elder of the hollow in an original fantasy boss battle.">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#0d181b;color:#e8e7d7;font-family:system-ui,-apple-system,sans-serif}body{display:flex;flex-direction:column;overflow:hidden}header{height:64px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 28px;border-bottom:1px solid #2b3c3e;background:#101f22}h1{font-size:16px;letter-spacing:.12em;margin:0;font-weight:650}small{font-size:11px;color:#8da5a4;letter-spacing:.1em;margin-left:16px}nav{display:flex;gap:10px}button{border:1px solid #405653;color:#dfe8dc;background:#1d3434;padding:9px 15px;border-radius:4px;font:inherit;font-size:12px;cursor:pointer}button:hover{background:#2b4c48}button:focus-visible{outline:2px solid #a5dac6;outline-offset:3px}main{position:relative;flex:1;display:grid;place-items:center;min-height:0;background:radial-gradient(ellipse at center,#233b39,#0d181b 70%)}#frame{position:relative;width:min(100vw,calc((100dvh - 64px) * 1.6));aspect-ratio:1.6;background:#112126;box-shadow:0 0 90px #0008}canvas{width:100%;height:100%;display:block;outline:none}#loading{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;background:radial-gradient(ellipse at 60% 30%,#2b4947,#101e24)}.eyebrow{color:#d7b773;font-size:12px;letter-spacing:.24em}.loading-title{font-family:Georgia,serif;font-size:clamp(32px,5vw,64px);margin:0}.track{width:240px;height:3px;background:#405750}.track span{display:block;height:100%;width:0;background:#a9d8bd;transition:width .15s}#status{font-size:13px;color:#a2b6af}#error{display:none;text-align:center;max-width:420px;padding:20px;line-height:1.6}dialog{background:#15292d;color:#e8e7d7;border:1px solid #527069;border-radius:8px;width:min(470px,90vw);padding:30px;box-shadow:0 20px 100px #0008}dialog::backdrop{background:#071112cc}dialog h2{font-family:Georgia,serif;font-size:28px;margin:0 0 22px}dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px}dt{color:#a9d8bd}dd{margin:0;color:#c6cec5}dialog p{font-size:13px;color:#9fb0aa;line-height:1.6}.close{margin-top:18px;width:100%}@media(max-width:650px){header{padding:0 14px}small{display:none}nav{gap:6px}button{padding:8px 10px}}
+  </style>
+</head>
+<body>
+  <header><div><h1>ASHEN HUNT <small>THE ELDER OF THE HOLLOW</small></h1></div><nav aria-label="Game tools"><button id="help">Controls</button><button id="fullscreen">Full screen ↗</button></nav></header>
+  <main><div id="frame"><canvas id="game" width="1440" height="900" tabindex="0" aria-label="Ashen Hunt game. Use keyboard and mouse. Press Enter to start."></canvas><div id="loading"><span class="eyebrow">JADE COMPANY / FIELD CONTRACT</span><p class="loading-title">Enter the hollow.</p><div class="track"><span id="progress"></span></div><span id="status">Loading the hunt…</span><div id="error"><p>The game could not start. Try reloading in a current desktop browser.</p><button onclick="location.reload()">Try again</button></div></div></div></main>
+  <dialog id="controls"><h2>Hunter’s field guide</h2><dl><dt>W A S D</dt><dd>Move</dd><dt>Shift / Space</dt><dd>Sprint / Evade</dd><dt>Left mouse / J</dt><dd>Sword combo</dd><dt>Hold right mouse / K</dt><dd>Charged heavy strike</dd><dt>Q</dt><dd>Healing tonic</dd><dt>Tab</dt><dd>Toggle lock-on</dd><dt>E / R</dt><dd>Rotate camera</dd><dt>Escape</dt><dd>Pause</dd></dl><p>Play on a desktop with keyboard and mouse. Read the beast’s warnings, dodge its attacks, and use recovery windows for heavy strikes. Heavy strikes break horns.</p><button class="close" id="close">Back to the hunt</button></dialog>
+  <script>
+    const canvas=document.getElementById('game'),loading=document.getElementById('loading'),status=document.getElementById('status');
+    let game;
+    function fail(error){console.error('Ashen Hunt failed to start',error);document.getElementById('error').style.display='block';status.hidden=true;}
+    const config={dataUrl:'Build/WebGL.data.unityweb',frameworkUrl:'Build/WebGL.framework.js.unityweb',codeUrl:'Build/WebGL.wasm.unityweb',streamingAssetsUrl:'StreamingAssets',companyName:'Jade Company',productName:'Ashen Hunt',productVersion:'0.3.0',devicePixelRatio:Math.min(window.devicePixelRatio||1,1.5),showBanner:(message,type)=>{if(type==='error')fail(message);else console.warn(message);}};
+    const loader=document.createElement('script');loader.src='Build/WebGL.loader.js';loader.onerror=fail;loader.onload=()=>createUnityInstance(canvas,config,p=>{document.getElementById('progress').style.width=(p*100)+'%';status.textContent='Loading the hunt… '+Math.round(p*100)+'%';}).then(instance=>{game=instance;loading.hidden=true;loading.style.display='none';canvas.focus();window.ashenHuntReady=true;}).catch(fail);document.body.appendChild(loader);
+    canvas.addEventListener('contextmenu',e=>e.preventDefault());canvas.addEventListener('pointerdown',()=>canvas.focus());
+    document.getElementById('fullscreen').onclick=()=>{if(game){game.SetFullscreen(1);canvas.focus();}};
+    const dialog=document.getElementById('controls');document.getElementById('help').onclick=()=>{if(game)game.SendMessage('Ashen Hunt','SetWebOverlayPaused',1);dialog.showModal();};document.getElementById('close').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{if(game)game.SendMessage('Ashen Hunt','SetWebOverlayPaused',0);canvas.focus();});
+  </script>
+</body>
+</html>
